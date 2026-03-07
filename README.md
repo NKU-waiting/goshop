@@ -305,14 +305,6 @@ npm run dev
 - Vue 代码遵循 [Vue Style Guide](https://vuejs.org/style-guide/)
 - 提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/)
 
-## 🤝 贡献指南
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
-
 ## 📝 更新日志
 
 ### v1.0.0 (2026-03-07) - 基于原项目的重大改进
@@ -333,18 +325,7 @@ npm run dev
 - ✅ 消息幂等性保证（防止重复订单）
 - ✅ 完整的监控日志系统
 
-**性能优化**:
-- ✅ 商品详情响应时间提升 10 倍（50ms → 5ms）
-- ✅ 分类列表响应时间提升 30 倍（150ms → 5ms）
-- ✅ 数据库查询减少 70-80%
-- ✅ 添加数据库索引优化
 
-**文档完善**:
-- ✅ Redis 应用说明文档
-- ✅ Kafka 应用说明文档
-- ✅ 代码质量优化报告
-- ✅ 完整的 API 文档
-- ✅ 部署和监控指南
 
 ## 📄 许可证
 
