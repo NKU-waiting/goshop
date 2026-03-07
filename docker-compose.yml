@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./newbee-mall-api-go
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./newbee-mall-api-go/config.yaml:/app/config.yaml
+      - ./newbee-mall-api-go/static:/app/static
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - goshop-network
+
+  # Frontend Service (User-facing)
+  frontend:
+    build:
+      context: /tmp/newbee-mall-vue3-app
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - goshop-network
+
+  # Admin Service (Management)
+  admin:
+    build:
+      context: ./vue3-admin
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    networks:
+      - goshop-network
+
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: newbee_mall_db_v2
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./newbee-mall-api-go/static-files/newbee_mall_db_v2_schema.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - goshop-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis Cache Service
+  redis:
+    image: redis:6.2-alpine
+    networks:
+      - goshop-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
+
+  # Zookeeper Service (for Kafka)
+  zookeeper:
+    image: 'bitnami/zookeeper:3.8'
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - goshop-network
+
+  # Kafka Message Queue Service
+  kafka:
+    image: 'bitnami/kafka:3.5'
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    networks:
+      - goshop-network
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql-data:
+
+networks:
+  goshop-network:
+    driver: bridge
