@@ -182,7 +182,7 @@ func processOrderMessage(m kf.Message) {
 		var newBeeMallOrderAddress mall.MallOrderAddress
 		copier.Copy(&newBeeMallOrderAddress, &orderEvent.Address)
 		newBeeMallOrderAddress.OrderId = newBeeMallOrder.OrderId
-		if err := tx.Save(&newBeeMallOrderAddress).Error; err != nil {
+		if err := tx.Create(&newBeeMallOrderAddress).Error; err != nil {
 			return fmt.Errorf("创建订单地址失败: %w", err)
 		}
 
@@ -195,7 +195,7 @@ func processOrderMessage(m kf.Message) {
 			newBeeMallOrderItem.CreateTime = common.JSONTime{Time: time.Now()}
 			newBeeMallOrderItems = append(newBeeMallOrderItems, newBeeMallOrderItem)
 		}
-		if err := tx.Save(&newBeeMallOrderItems).Error; err != nil {
+		if err := tx.Create(&newBeeMallOrderItems).Error; err != nil {
 			return fmt.Errorf("创建订单项失败: %w", err)
 		}
 

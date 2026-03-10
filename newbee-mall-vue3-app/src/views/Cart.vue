@@ -26,7 +26,7 @@
                 <div class="price">¥{{ item.sellingPrice }}</div>
                 <van-stepper
                   integer
-                  :min="1"
+                  :min="0"
                   :max="5"
                   :model-value="item.goodsCount"
                   :name="item.cartItemId"
@@ -125,9 +125,9 @@ const onChange = async (value, detail) => {
     showFailToast('超出单个商品的最大购买数量')
     return
   }
-  if (value < 1) {
-    showFailToast('商品不得小于0')
-    return
+  if (value < 0) {
+    showFailToast('商品数量不能小于0');
+    return;
   }
   /**
    * 这里的操作是因为，后面修改购物车后，手动添加的计步器的数据，为了防止数据不对
@@ -141,15 +141,17 @@ const onChange = async (value, detail) => {
     goodsCount: value
   }
   await modifyCart(params)
-  /**
-   * 修改完成后，没有请求购物车列表，是因为闪烁的问题，
-   * 这边手动给操作的购物车商品修改数据
-  */
-  state.list.forEach(item => {
-    if (item.cartItemId == detail.name) {
-      item.goodsCount = value
-    }
-  })
+  cart.updateCart()
+  // 如果数量修改为0，则重新获取列表
+  if (value === 0) {
+    init();
+  } else {
+    state.list.forEach(item => {
+      if (item.cartItemId == detail.name) {
+        item.goodsCount = value
+      }
+    });
+  }
   closeToast()
 }
 

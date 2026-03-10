@@ -24,7 +24,7 @@ services:
   # Frontend Service (User-facing)
   frontend:
     build:
-      context: /tmp/newbee-mall-vue3-app
+      context: ./newbee-mall-vue3-app
       dockerfile: Dockerfile
     ports:
       - "8080:80"
